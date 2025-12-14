@@ -18,6 +18,12 @@ costs = np.array([
     398, 376, 211, 310, 636, 239, 232, 355, 498, 761, 464, 221, 247, 0
 ])
 
-data = kit.ProblemData(costs, (0, 10e6))
+data = kit.ProblemData(costs, (0, 10))
 
 print(data)
+
+nn = kit.TspNearestNeighbour(data)
+
+solution = nn.solve(np.array([0.001]))
+
+print(solution)
