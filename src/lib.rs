@@ -1,7 +1,7 @@
 mod data;
 mod gils;
 mod metaheuristic;
-mod moves;
+mod neighbourhood;
 mod route;
 mod solution;
 mod tsp;

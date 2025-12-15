@@ -50,13 +50,15 @@ impl<'a> Construction for NearestNeighbour<'a> {
 
         solution.total_objective = route.objective;
 
-        debug_assert!(solution.invalid_cost_routes().is_empty());
+        debug_assert_eq!(solution.invalid_cost_routes(), vec![]);
 
         solution
     }
 }
 
 pub mod py {
+    use crate::solution::py_solution;
+
     use super::*;
 
     use pyo3::prelude::*;
@@ -75,14 +77,11 @@ pub mod py {
             Self { data }
         }
 
-        pub fn solve(&self, py: Python, alpha_bests: Vec<f32>) -> PyResult<Py<PyAny>> {
+        pub fn solve(&self, alpha_bests: Vec<f32>) -> PyResult<py_solution::Solution> {
             let nn = NearestNeighbour::new(&self.data, &alpha_bests);
             let solution = nn.solve();
 
-            let dict = PyDict::new(py);
-
-            dict.set_item("route", solution.routes[0].path.clone())?;
-            dict.set_item("objective", solution.calculate_cost())?;
+            let return_solution = py_solution::Solution::new(routes, total_objective);
 
             Ok(dict.into())
         }

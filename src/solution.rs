@@ -1,22 +1,116 @@
 use crate::{data::ProblemData, route::Route};
+use pyo3::prelude::*;
+
+// #[derive(Debug, Clone)]
+// pub struct Solution<'a> {
+//     data: &'a ProblemData,
+//     pub routes: Vec<Route<'a>>,
+//     pub total_objective: i32,
+// }
+
+// impl<'a> Solution<'a> {
+//     pub fn new(data: &'a ProblemData) -> Self {
+//         let mut routes = Vec::new();
+
+//         for id in 0..data.num_vehicles() {
+//             routes.push(Route::new(id, data));
+//         }
+
+//         Self {
+//             data,
+//             routes,
+//             total_objective: 0,
+//         }
+//     }
+
+//     pub fn calculate_total_objective(&self) -> i32 {
+//         let mut objective = 0;
+
+//         for route in &self.routes {
+//             objective += route.objective;
+//         }
+//         objective
+//     }
+
+//     pub fn calculate_cost(&self) -> i32 {
+//         let mut cost = 0;
+
+//         for route in &self.routes {
+//             cost += route.calculate_cost();
+//         }
+//         cost
+//     }
+
+//     pub fn calculate_update_cost(&mut self) -> i32 {
+//         let mut cost = 0;
+
+//         for route in &mut self.routes {
+//             route.objective = route.calculate_cost();
+//             cost += route.objective;
+//         }
+//         cost
+//     }
+
+//     pub fn calculate_update_latency(&mut self) -> i32 {
+//         let mut latency = 0;
+
+//         for route in &mut self.routes {
+//             route.objective = route.calculate_latency();
+//             latency += route.objective;
+//         }
+//         latency
+//     }
+
+//     pub fn invalid_cost_routes(&self) -> Vec<(usize, i32)> {
+//         let mut invalid_routes = Vec::new();
+
+//         for route in &self.routes {
+//             if !route.check_cost() {
+//                 invalid_routes.push((route.id(), route.calculate_cost()));
+//             }
+//         }
+//         invalid_routes
+//     }
+
+//     pub fn invalid_latency_routes(&self) -> Vec<(usize, i32)> {
+//         let mut invalid_routes = Vec::new();
+
+//         for route in &self.routes {
+//             if !route.check_latency() {
+//                 invalid_routes.push((route.id(), route.calculate_latency()));
+//             }
+//         }
+//         invalid_routes
+//     }
+
+//     pub fn to_py_solution(&self, py: Python) -> py_solution::Solution {
+//         let mut routes = Vec::new();
+
+//         for route in &self.routes {
+//             routes.push(Py::new(py, route.to_py_route()).unwrap());
+//         }
+//         py_solution::Solution {
+//             routes,
+//             total_objective: self.total_objective,
+//         }
+//     }
+// }
 
 #[derive(Debug, Clone)]
-pub struct Solution<'a> {
-    data: &'a ProblemData,
-    pub routes: Vec<Route<'a>>,
+pub struct Solution {
+    pub routes: Vec<Route>,
     pub total_objective: i32,
 }
 
-impl<'a> Solution<'a> {
-    pub fn new(data: &'a ProblemData) -> Self {
+impl Solution {
+    pub fn new(data: &ProblemData) -> Self {
         let mut routes = Vec::new();
 
         for id in 0..data.num_vehicles() {
-            routes.push(Route::new(id, data));
+            routes.push(Route::new(id, Vec::new(), 0));
         }
 
         Self {
-            data,
             routes,
             total_objective: 0,
         }
@@ -31,52 +125,52 @@ impl<'a> Solution<'a> {
         objective
     }
 
-    pub fn calculate_cost(&self) -> i32 {
+    pub fn calculate_cost(&self, data: &ProblemData) -> i32 {
         let mut cost = 0;
 
         for route in &self.routes {
-            cost += route.calculate_cost();
+            cost += route.calculate_cost(data);
         }
         cost
     }
 
-    pub fn calculate_update_cost(&mut self) -> i32 {
+    pub fn calculate_update_cost(&mut self, data: &ProblemData) -> i32 {
         let mut cost = 0;
 
         for route in &mut self.routes {
-            route.objective = route.calculate_cost();
+            route.objective = route.calculate_cost(data);
             cost += route.objective;
         }
         cost
     }
 
-    pub fn calculate_update_latency(&mut self) -> i32 {
+    pub fn calculate_update_latency(&mut self, data: &ProblemData) -> i32 {
         let mut latency = 0;
 
         for route in &mut self.routes {
-            route.objective = route.calculate_latency();
+            route.objective = route.calculate_latency(data);
             latency += route.objective;
         }
         latency
     }
 
-    pub fn invalid_cost_routes(&self) -> Vec<(usize, i32)> {
+    pub fn invalid_cost_routes(&self, data: &ProblemData) -> Vec<(usize, i32)> {
         let mut invalid_routes = Vec::new();
 
         for route in &self.routes {
-            if !route.check_cost() {
-                invalid_routes.push((route.id(), route.calculate_cost()));
+            if !route.check_cost(data) {
+                invalid_routes.push((route.id(), route.calculate_cost(data)));
             }
         }
         invalid_routes
     }
 
-    pub fn invalid_latency_routes(&self) -> Vec<(usize, i32)> {
+    pub fn invalid_latency_routes(&self, data: &ProblemData) -> Vec<(usize, i32)> {
         let mut invalid_routes = Vec::new();
 
         for route in &self.routes {
-            if !route.check_latency() {
-                invalid_routes.push((route.id(), route.calculate_latency()));
+            if !route.check_latency(data) {
+                invalid_routes.push((route.id(), route.calculate_latency(data)));
             }
         }
         invalid_routes

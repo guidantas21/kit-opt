@@ -1,6 +1,6 @@
 use crate::{
     data::ProblemData, metaheuristic::Construction, metaheuristic::LocalSearch,
-    metaheuristic::Perturbation, moves::Move, solution::Solution,
+    metaheuristic::Perturbation, neighbourhood::Move, solution::Solution,
 };
 
 #[derive(Debug)]
@@ -26,12 +26,7 @@ where
         }
     }
 
-    pub fn solve(
-        &self,
-        num_grasp_iters: usize,
-        num_ils_iters: usize,
-        moves: &[Move],
-    ) -> Solution<'_> {
+    pub fn solve(&self, num_grasp_iters: usize, num_ils_iters: usize, moves: &[Move]) -> Solution {
         let mut global_best = Solution::new(self.data);
         global_best.total_objective = i32::MAX;
 
