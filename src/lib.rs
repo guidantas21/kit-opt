@@ -1,10 +1,11 @@
-mod data;
-mod gils;
-mod metaheuristic;
-mod neighbourhood;
-mod route;
-mod solution;
-mod tsp;
+pub mod data;
+pub mod gils;
+pub mod metaheuristic;
+pub mod mlp;
+pub mod neighbourhood;
+pub mod route;
+pub mod solution;
+pub mod tsp;
 
 use pyo3::prelude::*;
 
@@ -26,6 +27,15 @@ fn kit_opt(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<tsp::PyDoubleBridge>()?;
 
     m.add_class::<tsp::PyGilsRvnd>()?;
+
+    m.add_class::<mlp::PyCheapestInsertion>()?;
+    m.add_class::<mlp::PyNearestNeighbour>()?;
+
+    m.add_class::<mlp::PyRvnd>()?;
+
+    m.add_class::<mlp::PyDoubleBridge>()?;
+
+    m.add_class::<mlp::PyGilsRvnd>()?;
 
     m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
 

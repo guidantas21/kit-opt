@@ -1,0 +1,60 @@
+import kit_opt as kit
+import numpy as np
+
+costs = np.array([
+    0, 153, 510, 706, 966, 581, 455, 70, 160, 372, 157, 567, 342, 398, 
+    153, 0, 422, 664, 997, 598, 507, 197, 311, 479, 310, 581, 417, 376, 
+    510, 422, 0, 289, 744, 390, 437, 491, 645, 880, 618, 374, 455, 211, 
+    706, 664, 289, 0, 491, 265, 410, 664, 804, 1070, 768, 259, 499,310, 
+    966, 997, 744, 491, 0, 400, 514, 902, 990, 1261, 947, 418, 635, 636, 
+    581, 598, 390, 265, 400, 0, 168, 522, 634, 910, 593, 19, 284, 239, 
+    455, 507, 437, 410, 514, 168, 0, 389,482, 757, 439, 163, 124, 232, 
+    70, 197, 491, 664, 902, 522, 389, 0, 154, 406, 133, 508, 273,355, 
+    160, 311, 645, 804, 990, 634, 482, 154, 0, 276, 43, 623, 358, 498, 
+    372, 479, 880,1070, 1261, 910, 757, 406, 276, 0, 318, 898, 633, 761, 
+    157, 310, 618, 768, 947, 593, 439, 133, 43, 318, 0, 582, 315, 464, 
+    567, 581, 374, 259, 418, 19, 163, 508, 623, 898, 582, 0,275, 221, 
+    342, 417, 455, 499, 635, 284, 124, 273, 358, 633, 315, 275, 0, 247, 
+    398, 376, 211, 310, 636, 239, 232, 355, 498, 761, 464, 221, 247, 0,
+])
+
+data = kit.ProblemData(costs, (0, 10))
+
+print(data)
+
+nn = kit.MlpNearestNeighbour(data)
+nn_solution = nn.solve(np.array([0.025]))
+
+print(nn_solution.routes[0].path)
+print(nn_solution.total_objective)
+
+rvnd = kit.MlpRvnd(data)
+
+nn_rvnd_solution = rvnd.solve(nn_solution)
+
+print(nn_rvnd_solution.routes[0].path)
+print(nn_rvnd_solution.total_objective)
+
+# ci = kit.MlpCheapestInsertion(data)
+# ci_solution = ci.solve()
+
+# print(ci_solution.routes[0].path)
+# print(ci_solution.total_objective)
+
+# ci_rvnd_solution = rvnd.solve(ci_solution)
+
+# print(ci_rvnd_solution.routes[0].path)
+# print(ci_rvnd_solution.total_objective)
+
+# db = kit.MlpDoubleBridge(data)
+
+# db_solution = db.solve(ci_rvnd_solution)
+
+# print(db_solution.routes[0].path)
+# print(db_solution.total_objective)
+
+# gils_rvnd = kit.MlpGilsRvnd(data)
+# gils_rvnd_solution = gils_rvnd.solve(50, data.dimension)
+
+# print(gils_rvnd_solution.routes[0].path)
+# print(gils_rvnd_solution.total_objective)

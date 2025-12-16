@@ -1,5 +1,8 @@
-use crate::solution::PySolution;
-use crate::{data::ProblemData, metaheuristic::Construction, solution::Solution};
+use crate::{
+    data::ProblemData,
+    metaheuristic::Construction,
+    solution::{PySolution, Solution},
+};
 
 use pyo3::prelude::*;
 
@@ -13,7 +16,7 @@ pub struct NearestNeighbour<'a> {
 
 impl<'a> NearestNeighbour<'a> {
     pub fn new(data: &'a ProblemData, alpha_bests: &'a Vec<f32>) -> Self {
-        Self { alpha_bests, data }
+        Self { data, alpha_bests }
     }
 }
 
@@ -49,17 +52,17 @@ impl<'a> Construction for NearestNeighbour<'a> {
             candidate_list.swap_remove(node_idx);
         }
         route.path.push(0);
-        route.objective = route.calculate_cost();
+        route.objective = route.calculate_latency();
 
         solution.total_objective = route.objective;
 
-        debug_assert_eq!(solution.invalid_cost_routes(), vec![]);
+        debug_assert_eq!(solution.invalid_latency_routes(), vec![]);
 
         solution
     }
 }
 
-#[pyclass(name = "TspNearestNeighbour")]
+#[pyclass(name = "MlpNearestNeighbour")]
 pub struct PyNearestNeighbour {
     data: ProblemData,
 }

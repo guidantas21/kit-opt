@@ -9,7 +9,7 @@ pub use constructions::{
 
 pub use local_search::{PyRvnd, or_opt, swap, two_opt};
 
-pub use perturbations::double_brigde::{DoubleBridge, PyDoubleBridge};
+pub use perturbations::double_bridge::{DoubleBridge, PyDoubleBridge};
 
 use pyo3::prelude::*;
 
