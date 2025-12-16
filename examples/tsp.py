@@ -52,3 +52,9 @@ db_solution = db.solve(ci_rvnd_solution)
 
 print(db_solution.routes[0].path)
 print(db_solution.total_objective)
+
+gils_rvnd = kit.TspGilsRvnd(data)
+gils_rvnd_solution = gils_rvnd.solve(50, data.dimension)
+
+print(gils_rvnd_solution.routes[0].path)
+print(gils_rvnd_solution.total_objective)

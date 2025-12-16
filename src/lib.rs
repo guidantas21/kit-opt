@@ -25,6 +25,8 @@ fn kit_opt(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
     m.add_class::<tsp::PyDoubleBridge>()?;
 
+    m.add_class::<tsp::PyGilsRvnd>()?;
+
     m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
 
     Ok(())
