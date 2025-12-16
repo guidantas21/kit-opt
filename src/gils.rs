@@ -26,7 +26,12 @@ where
         }
     }
 
-    pub fn solve(&self, num_grasp_iters: usize, num_ils_iters: usize, moves: &[Move]) -> Solution {
+    pub fn solve(
+        &self,
+        num_grasp_iters: usize,
+        num_ils_iters: usize,
+        moves: &[Move],
+    ) -> Solution<'_> {
         let mut global_best = Solution::new(self.data);
         global_best.total_objective = i32::MAX;
 

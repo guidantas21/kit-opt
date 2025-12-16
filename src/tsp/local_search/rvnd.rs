@@ -1,12 +1,13 @@
 use rand::{Rng, rng};
 
+use crate::solution::PySolution;
 use crate::{
-    data::ProblemData,
-    metaheuristic::LocalSearch,
-    neighbourhood::Move,
-    solution::{self, Solution},
-    tsp,
+    data::ProblemData, metaheuristic::LocalSearch, neighbourhood::Move, solution::Solution, tsp,
 };
+
+use crate::neighbourhood::TSP_BS_B2O_BOO123;
+
+use pyo3::prelude::*;
 
 pub struct Rvnd<'a> {
     data: &'a ProblemData,
@@ -44,42 +45,27 @@ impl<'a> LocalSearch for Rvnd<'a> {
     }
 }
 
-pub mod py {
-    use crate::neighbourhood::TSP_BS_B2O_BOO123;
-    use crate::solution::py_solution;
+#[pyclass(name = "TspRvnd")]
+pub struct PyRvnd {
+    data: ProblemData,
+}
 
-    use super::*;
-
-    use pyo3::prelude::*;
-    use pyo3::types::PyDict;
-
-    #[pyclass]
-    pub struct TspRvnd {
-        data: ProblemData,
+#[pymethods]
+impl PyRvnd {
+    #[new]
+    #[pyo3(signature = (data))]
+    pub fn new(data: ProblemData) -> Self {
+        Self { data }
     }
 
-    #[pymethods]
-    impl TspRvnd {
-        #[new]
-        #[pyo3(signature = (data))]
-        pub fn new(data: ProblemData) -> Self {
-            Self { data }
-        }
+    pub fn solve(&self, py: Python, solution_handle: Py<PySolution>) -> PyResult<PySolution> {
+        let py_solution = solution_handle.borrow(py);
 
-        pub fn solve(
-            &self,
-            py: Python,
-            initial_solution: Py<py_solution::Solution>,
-        ) -> PyResult<Py<py_solution::Solution>> {
-            let rvnd = Rvnd::new(&self.data);
+        let rvnd = Rvnd::new(&self.data);
+        let mut rs_solution = Solution::from_py(&py_solution, &self.data);
 
-            let solution = rvnd.apply(initial_solution, TSP_BS_B2O_BOO123);
+        rvnd.apply(&mut rs_solution, TSP_BS_B2O_BOO123);
 
-            Ok(solution)
-        }
-    }
-
-    impl TspRvnd {
-        pub fn to_solution(&self) -> Solution {}
+        Ok(rs_solution.into())
     }
 }

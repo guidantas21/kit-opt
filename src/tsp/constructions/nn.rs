@@ -1,4 +1,9 @@
+use crate::route::PyRoute;
+use crate::solution::PySolution;
 use crate::{data::ProblemData, metaheuristic::Construction, solution::Solution};
+
+use pyo3::prelude::*;
+use pyo3::types::PyDict;
 
 use rand::Rng;
 
@@ -56,34 +61,36 @@ impl<'a> Construction for NearestNeighbour<'a> {
     }
 }
 
-pub mod py {
-    use crate::solution::py_solution;
+#[pyclass(name = "TspNearestNeighbour")]
+pub struct PyNearestNeighbour {
+    data: ProblemData,
+}
 
-    use super::*;
-
-    use pyo3::prelude::*;
-    use pyo3::types::PyDict;
-
-    #[pyclass]
-    pub struct TspNearestNeighbour {
-        data: ProblemData,
+#[pymethods]
+impl PyNearestNeighbour {
+    #[new]
+    #[pyo3(signature = (data))]
+    pub fn new(data: ProblemData) -> Self {
+        Self { data }
     }
 
-    #[pymethods]
-    impl TspNearestNeighbour {
-        #[new]
-        #[pyo3(signature = (data))]
-        pub fn new(data: ProblemData) -> Self {
-            Self { data }
-        }
+    pub fn solve(&self, alpha_bests: Vec<f32>) -> PyResult<PySolution> {
+        let nn = NearestNeighbour::new(&self.data, &alpha_bests);
+        let rs_solution = nn.solve();
 
-        pub fn solve(&self, alpha_bests: Vec<f32>) -> PyResult<py_solution::Solution> {
-            let nn = NearestNeighbour::new(&self.data, &alpha_bests);
-            let solution = nn.solve();
+        let py_routes: Vec<PyRoute> = rs_solution
+            .routes
+            .iter()
+            .map(|r| PyRoute {
+                id: r.id(),
+                path: r.path.clone(),
+                objective: r.objective,
+            })
+            .collect();
 
-            let return_solution = py_solution::Solution::new(routes, total_objective);
-
-            Ok(dict.into())
-        }
+        Ok(PySolution {
+            routes: py_routes,
+            total_objective: rs_solution.calculate_cost(),
+        })
     }
 }

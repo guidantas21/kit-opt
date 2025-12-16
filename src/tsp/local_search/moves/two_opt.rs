@@ -55,7 +55,7 @@ fn test_objective(solution: &Solution, delta: i32, i: usize, j: usize) {
 
     solution_after_move.routes[0].path[i..=j].reverse();
 
-    let expected_objective = solution.calculate_cost();
+    let expected_objective = solution_after_move.calculate_cost();
 
     assert_eq!(
         move_objective, expected_objective,

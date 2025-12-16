@@ -1,7 +1,9 @@
 use crate::data::ProblemData;
 use crate::metaheuristic::Construction;
 use crate::route::Route;
-use crate::solution::Solution;
+use crate::solution::{PySolution, Solution};
+
+use pyo3::prelude::*;
 
 use rand::Rng;
 
@@ -31,7 +33,7 @@ impl<'a> CheapestInsertion<'a> {
         Self { data }
     }
 
-    pub fn init_solution(&self) -> (Solution, Vec<usize>) {
+    pub fn init_solution(&self) -> (Solution<'_>, Vec<usize>) {
         let mut rng = rand::rng();
 
         let mut candidate_list: Vec<usize> = (1..self.data.dimension()).collect();
@@ -55,7 +57,7 @@ impl<'a> CheapestInsertion<'a> {
 
         solution.total_objective = route.objective;
 
-        debug_assert!(solution.invalid_cost_routes(&self.data).is_empty());
+        debug_assert!(solution.invalid_cost_routes().is_empty());
 
         (solution, candidate_list)
     }
@@ -81,7 +83,7 @@ impl<'a> CheapestInsertion<'a> {
 }
 
 impl<'a> Construction for CheapestInsertion<'a> {
-    fn solve(&self) -> Solution {
+    fn solve(&self) -> Solution<'_> {
         let mut rng = rand::rng();
         let (mut solution, mut candidate_list) = self.init_solution();
 
@@ -106,41 +108,29 @@ impl<'a> Construction for CheapestInsertion<'a> {
         }
         solution.total_objective = route.objective;
 
-        debug_assert_eq!(solution.invalid_cost_routes(&self.data), vec![]);
+        debug_assert_eq!(solution.invalid_cost_routes(), vec![]);
 
         solution
     }
 }
 
-pub mod py {
-    use super::*;
+#[pyclass(name = "TspCheapestInsertion")]
+pub struct PyCheapestInsertion {
+    data: ProblemData,
+}
 
-    use pyo3::prelude::*;
-    use pyo3::types::PyDict;
-
-    #[pyclass]
-    pub struct TspCheapestInsertion {
-        data: ProblemData,
+#[pymethods]
+impl PyCheapestInsertion {
+    #[new]
+    #[pyo3(signature = (data))]
+    pub fn new(data: ProblemData) -> Self {
+        Self { data }
     }
 
-    #[pymethods]
-    impl TspCheapestInsertion {
-        #[new]
-        #[pyo3(signature = (data))]
-        pub fn new(data: ProblemData) -> Self {
-            Self { data }
-        }
+    pub fn solve(&self) -> PyResult<PySolution> {
+        let ci = CheapestInsertion::new(&self.data);
+        let solution = ci.solve();
 
-        pub fn solve(&self, py: Python) -> PyResult<Py<PyAny>> {
-            let ci = CheapestInsertion::new(&self.data);
-            let solution = ci.solve();
-
-            let dict = PyDict::new(py);
-
-            dict.set_item("route", solution.routes[0].path.clone())?;
-            dict.set_item("objective", solution.calculate_cost(&self.data))?;
-
-            Ok(dict.into())
-        }
+        Ok(solution.into())
     }
 }

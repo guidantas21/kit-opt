@@ -1,7 +1,7 @@
 use crate::{neighbourhood::Move, solution::Solution};
 
 pub trait Construction {
-    fn solve(&self) -> Solution;
+    fn solve(&self) -> Solution<'_>;
 }
 
 pub trait LocalSearch {

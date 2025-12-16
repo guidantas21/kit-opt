@@ -69,7 +69,7 @@ pub fn best_improvement(solution: &mut Solution, block_size: usize, data: &Probl
 
         solution.total_objective = route.objective;
 
-        debug_assert_eq!(solution.invalid_cost_routes(data), vec![]);
+        debug_assert_eq!(solution.invalid_cost_routes(), vec![]);
 
         return true;
     }
@@ -87,7 +87,7 @@ fn test_objective(solution: &Solution, delta: i32, block_size: usize, i: usize, 
     } else {
         solution_after_move.routes[0].path[j..=i + block_size - 1].rotate_right(block_size);
     }
-    let expected_objective = solution_after_move.calculate_cost(data);
+    let expected_objective = solution_after_move.calculate_cost();
 
     assert_eq!(
         move_objective, expected_objective,

@@ -23,11 +23,25 @@ data = kit.ProblemData(costs, (0, 10))
 print(data)
 
 nn = kit.TspNearestNeighbour(data)
-nn_solution = nn.solve(np.array([0.001]))
+nn_solution = nn.solve(np.array([0.025]))
 
-print(nn_solution)
+print(nn_solution.routes[0].path)
+print(nn_solution.total_objective)
+
+rvnd = kit.TspRvnd(data)
+
+nn_rvnd_solution = rvnd.solve(nn_solution)
+
+print(nn_rvnd_solution.routes[0].path)
+print(nn_rvnd_solution.total_objective)
 
 ci = kit.TspCheapestInsertion(data)
 ci_solution = ci.solve()
 
-print(ci_solution)
+print(ci_solution.routes[0].path)
+print(ci_solution.total_objective)
+
+ci_rvnd_solution = rvnd.solve(ci_solution)
+
+print(ci_rvnd_solution.routes[0].path)
+print(ci_rvnd_solution.total_objective)
