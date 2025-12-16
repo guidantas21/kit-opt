@@ -45,3 +45,10 @@ ci_rvnd_solution = rvnd.solve(ci_solution)
 
 print(ci_rvnd_solution.routes[0].path)
 print(ci_rvnd_solution.total_objective)
+
+db = kit.TspDoubleBridge(data)
+
+db_solution = db.solve(ci_rvnd_solution)
+
+print(db_solution.routes[0].path)
+print(db_solution.total_objective)
